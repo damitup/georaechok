@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "거래촉",
+  "version": "0.1.0",
+  "description": "중고거래 대화에서 사기 위험 신호를 확인하도록 돕는 확장 프로그램",
+  "permissions": ["sidePanel"],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
+  "action": {
+    "default_title": "거래촉 열기"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["dist/content.js"]
+    }
+  ]
+}

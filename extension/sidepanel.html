@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>거래촉</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 16px;
+        color: #222;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 8px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      #selected-text {
+        white-space: pre-wrap;
+        word-break: break-word;
+        background: #f4f4f4;
+        padding: 12px;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>거래촉</h1>
+    <p>중고거래 대화 중 의심스러운 부분을 드래그해 선택한 뒤, 아래 버튼을 눌러 주세요.</p>
+
+    <button id="get-selection" type="button">선택한 텍스트 가져오기</button>
+
+    <p id="status"></p>
+    <pre id="selected-text" hidden></pre>
+
+    <script src="dist/sidepanel.js"></script>
+  </body>
+</html>
