@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "description": "중고거래 대화에서 사기 위험 신호를 확인하도록 돕는 확장 프로그램",
   "permissions": ["sidePanel"],
+  "host_permissions": ["http://127.0.0.1:8000/*"],
   "background": {
     "service_worker": "dist/background.js"
   },

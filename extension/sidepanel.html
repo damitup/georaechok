@@ -13,11 +13,16 @@
         font-size: 20px;
         margin: 0 0 8px;
       }
+      h2 {
+        font-size: 16px;
+        margin: 16px 0 8px;
+      }
       button {
         width: 100%;
         padding: 10px;
         font-size: 14px;
         cursor: pointer;
+        margin-bottom: 8px;
       }
       #selected-text {
         white-space: pre-wrap;
@@ -26,6 +31,17 @@
         padding: 12px;
         border-radius: 6px;
       }
+      #analysis-result {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 12px;
+      }
+      #analysis-result ul {
+        padding-left: 20px;
+      }
+      #analysis-error {
+        color: #b00020;
+      }
     </style>
   </head>
   <body>
@@ -33,9 +49,19 @@
     <p>중고거래 대화 중 의심스러운 부분을 드래그해 선택한 뒤, 아래 버튼을 눌러 주세요.</p>
 
     <button id="get-selection" type="button">선택한 텍스트 가져오기</button>
+    <button id="analyze" type="button">거래 분석</button>
 
     <p id="status"></p>
     <pre id="selected-text" hidden></pre>
+
+    <p id="analysis-error" hidden></p>
+    <section id="analysis-result" hidden>
+      <h2>위험 수준: <span id="risk-level"></span></h2>
+      <h2>발견된 위험 신호</h2>
+      <ul id="signal-list"></ul>
+      <h2>권장 행동</h2>
+      <p id="recommendation"></p>
+    </section>
 
     <script src="dist/sidepanel.js"></script>
   </body>
