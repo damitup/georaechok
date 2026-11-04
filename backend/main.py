@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from text_preprocessing import preprocess_text
+
 app = FastAPI(title="거래촉 API")
 
 # Side Panel의 출처(origin)는 chrome-extension://<확장 프로그램 ID> 이다.
@@ -34,8 +36,17 @@ class AnalyzeResponse(BaseModel):
 
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
+    # 원문은 덮어쓰지 않고, 정규화 결과와 함께 보관한다. 이후 LLM에 둘 다 전달한다.
+    preprocessed = preprocess_text(request.text)
+
+    # 거래 대화에는 개인정보가 있을 수 있으므로 내용은 출력하지 않고 길이만 확인한다.
+    line_count = len(preprocessed.normalized_text.splitlines())
+    print(
+        f"[analyze] 원문 {len(preprocessed.original_text)}자, "
+        f"정규화 {len(preprocessed.normalized_text)}자, {line_count}줄"
+    )
+
     # 아직 AI를 연결하지 않았으므로 통신 확인용 고정 결과를 돌려준다.
-    print(f"[analyze] 받은 텍스트 ({len(request.text)}자): {request.text[:50]}")
     return AnalyzeResponse(
         riskLevel="CAUTION",
         signals=[
