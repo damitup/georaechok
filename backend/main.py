@@ -1,10 +1,23 @@
-from fastapi import FastAPI
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from ai_analyzer import AnalysisError, AnalyzeResponse, analyze_conversation, check_settings
 from text_preprocessing import preprocess_text
 
-app = FastAPI(title="거래촉 API")
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # 설정이 없어도 서버는 띄우고, 원인을 시작 로그에 알린다. 분석 요청에는 503 오류로 응답한다.
+    settings_problem = check_settings()
+    if settings_problem:
+        print(f"[startup] 경고: {settings_problem} /analyze 요청은 실패합니다.")
+    yield
+
+
+app = FastAPI(title="거래촉 API", lifespan=lifespan)
 
 # Side Panel의 출처(origin)는 chrome-extension://<확장 프로그램 ID> 이다.
 # manifest.json의 host_permissions가 있으면 CORS 없이도 요청되지만,
@@ -22,21 +35,10 @@ class AnalyzeRequest(BaseModel):
     text: str = Field(min_length=1)
 
 
-class RiskSignal(BaseModel):
-    type: str
-    reason: str
-
-
-# 응답 본문. Extension에서 그대로 쓰도록 JSON 키 이름(camelCase)을 맞춘다.
-class AnalyzeResponse(BaseModel):
-    riskLevel: str
-    signals: list[RiskSignal]
-    recommendation: str
-
-
+# 응답 본문(AnalyzeResponse)은 Gemini Structured Output 스키마와 같으므로 ai_analyzer.py에 정의한다.
 @app.post("/analyze", response_model=AnalyzeResponse)
 def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
-    # 원문은 덮어쓰지 않고, 정규화 결과와 함께 보관한다. 이후 LLM에 둘 다 전달한다.
+    # 원문은 덮어쓰지 않고, 정규화 결과와 함께 보관한다. Gemini에 둘 다 전달한다.
     preprocessed = preprocess_text(request.text)
 
     # 거래 대화에는 개인정보가 있을 수 있으므로 내용은 출력하지 않고 길이만 확인한다.
@@ -46,14 +48,11 @@ def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
         f"정규화 {len(preprocessed.normalized_text)}자, {line_count}줄"
     )
 
-    # 아직 AI를 연결하지 않았으므로 통신 확인용 고정 결과를 돌려준다.
-    return AnalyzeResponse(
-        riskLevel="CAUTION",
-        signals=[
-            RiskSignal(
-                type="테스트 위험 신호",
-                reason="현재는 AI 연결 전 통신 테스트용 결과입니다.",
-            )
-        ],
-        recommendation="추가 확인이 필요합니다.",
-    )
+    try:
+        result = analyze_conversation(preprocessed)
+    except AnalysisError as error:
+        # Extension은 {"detail": "..."}의 메시지를 그대로 사용자에게 보여 준다.
+        raise HTTPException(status_code=error.status_code, detail=error.message) from error
+
+    print(f"[analyze] 결과 {result.riskLevel}, 신호 {len(result.signals)}개")
+    return result

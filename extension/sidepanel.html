@@ -4,62 +4,207 @@
     <meta charset="utf-8" />
     <title>거래촉</title>
     <style>
+      * {
+        box-sizing: border-box;
+      }
       body {
         font-family: system-ui, sans-serif;
-        margin: 16px;
-        color: #222;
+        margin: 0;
+        padding: 24px 16px;
+        background: #fff;
+        color: #1f2937;
+        font-size: 14px;
+        line-height: 1.5;
       }
       h1 {
-        font-size: 20px;
-        margin: 0 0 8px;
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 6px;
       }
       h2 {
-        font-size: 16px;
+        font-size: 15px;
+        margin: 0 0 8px;
+      }
+      h3 {
+        font-size: 14px;
         margin: 16px 0 8px;
       }
+      .description {
+        margin: 0 0 20px;
+        color: #6b7280;
+        font-size: 13px;
+      }
+
+      /* 버튼 영역: 왼쪽 보조 버튼은 남는 너비를 모두 쓰고, 오른쪽 분석 버튼은 고정 너비 */
+      .action-row {
+        display: flex;
+        gap: 10px;
+      }
       button {
-        width: 100%;
-        padding: 10px;
+        padding: 10px 12px;
         font-size: 14px;
+        font-family: inherit;
+        border-radius: 8px;
         cursor: pointer;
-        margin-bottom: 8px;
+      }
+      button:disabled {
+        cursor: default;
+        opacity: 0.6;
+      }
+      #get-selection {
+        flex: 1;
+        min-width: 0;
+        background: #f9fafb;
+        color: #374151;
+        border: 1px solid #6b7280;
+      }
+      #get-selection:hover {
+        background: #f3f4f6;
+      }
+      #analyze {
+        flex: none;
+        min-width: 76px;
+        background: #2563eb;
+        color: #fff;
+        border: 1px solid #2563eb;
+        font-weight: 600;
+      }
+      #analyze:hover:not(:disabled) {
+        background: #1d4ed8;
+      }
+
+      #status {
+        margin: 12px 0 0;
+        color: #6b7280;
+        font-size: 13px;
+      }
+      #status:empty {
+        display: none;
+      }
+
+      #selected-section {
+        margin-top: 24px;
       }
       #selected-text {
+        margin: 0;
+        font-family: inherit;
         white-space: pre-wrap;
         word-break: break-word;
-        background: #f4f4f4;
-        padding: 12px;
-        border-radius: 6px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 12px 14px;
       }
-      #analysis-result {
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        padding: 12px;
-      }
-      #analysis-result ul {
-        padding-left: 20px;
-      }
+
+      /* 분석 실패는 거래 위험도가 아니므로 위험 상태 색상을 쓰지 않는다. */
       #analysis-error {
-        color: #b00020;
+        margin: 24px 0 0;
+        padding: 12px 14px;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        color: #b42318;
+      }
+
+      /* 결과 카드. 상태 class(safe/caution/danger)가 아래 색상 변수를 정한다. */
+      #analysis-result {
+        --card-bg: #fff;
+        --card-border: #e5e7eb;
+        --card-accent: #1f2937;
+        margin-top: 24px;
+        padding: 16px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+      }
+      #analysis-result.safe {
+        --card-bg: #f0fdf4;
+        --card-border: #86efac;
+        --card-accent: #15803d;
+      }
+      #analysis-result.caution {
+        --card-bg: #fff7e6;
+        --card-border: #f5a623;
+        --card-accent: #c2410c;
+      }
+      #analysis-result.danger {
+        --card-bg: #fff1f2;
+        --card-border: #fb7185;
+        --card-accent: #dc2626;
+      }
+      .risk-heading {
+        margin: 0;
+        font-size: 17px;
+        color: var(--card-accent);
+      }
+      #safe-message {
+        margin: 12px 0 0;
+        color: var(--card-accent);
+      }
+      #analysis-result h3 {
+        color: #111827;
+      }
+
+      #signal-list {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .signal + .signal {
+        margin-top: 14px;
+      }
+      .signal-type {
+        font-weight: 700;
+        font-size: 15px;
+      }
+      .field-label {
+        margin-top: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+      }
+      .evidence {
+        margin: 4px 0 0;
+        padding: 8px 10px;
+        background: rgba(255, 255, 255, 0.75);
+        border-left: 3px solid var(--card-border);
+        border-radius: 6px;
+        word-break: break-word;
+      }
+      .reason {
+        margin-top: 2px;
+        font-size: 13px;
+        color: #4b5563;
+      }
+      #recommendation {
+        margin: 0;
       }
     </style>
   </head>
   <body>
-    <h1>거래촉</h1>
-    <p>중고거래 대화 중 의심스러운 부분을 드래그해 선택한 뒤, 아래 버튼을 눌러 주세요.</p>
+    <h1>🚨 거래촉</h1>
+    <p class="description">중고거래 대화 중 의심스러운 부분을 드래그하여 선택한 뒤, 아래 버튼을 눌러 주세요.</p>
 
-    <button id="get-selection" type="button">선택한 텍스트 가져오기</button>
-    <button id="analyze" type="button">거래 분석</button>
+    <div class="action-row">
+      <button id="get-selection" type="button">선택한 텍스트 가져오기</button>
+      <button id="analyze" type="button">분석</button>
+    </div>
 
     <p id="status"></p>
-    <pre id="selected-text" hidden></pre>
+
+    <section id="selected-section" hidden>
+      <h2>선택한 대화 내용</h2>
+      <pre id="selected-text"></pre>
+    </section>
 
     <p id="analysis-error" hidden></p>
     <section id="analysis-result" hidden>
-      <h2>위험 수준: <span id="risk-level"></span></h2>
-      <h2>발견된 위험 신호</h2>
-      <ul id="signal-list"></ul>
-      <h2>권장 행동</h2>
+      <p class="risk-heading"><strong>위험 수준 : <span id="risk-level"></span></strong></p>
+      <p id="safe-message" hidden>✓ 현재 선택된 대화에서 뚜렷한 위험 신호가 확인되지 않았습니다.</p>
+      <div id="signal-section">
+        <h3>발견된 위험 신호</h3>
+        <ul id="signal-list"></ul>
+      </div>
+      <h3>권장 행동</h3>
       <p id="recommendation"></p>
     </section>
 

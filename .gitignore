@@ -220,3 +220,6 @@ __marimo__/
 .streamlit/secrets.toml
 
 .vscode/
+
+# Environment variables / API keys
+backend/.env

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>거래촉 시연용 중고거래</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px 16px 48px;
+      background: #eef1f4;
+      color: #1f2328;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      line-height: 1.5;
+    }
+
+    .page {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* 시연용 안내 영역: 대화 선택에 섞이지 않도록 선택 불가 처리 */
+    .notice,
+    .guide {
+      user-select: none;
+      font-size: 12px;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    .notice {
+      margin-bottom: 16px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: #e3e7ec;
+    }
+
+    .guide {
+      margin-top: 20px;
+    }
+
+    .card {
+      overflow: hidden;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
+    }
+
+    .header {
+      user-select: none;
+      padding: 14px 18px;
+      border-bottom: 1px solid #edf0f3;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .product {
+      user-select: none;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid #edf0f3;
+      background: #fafbfc;
+    }
+
+    .product-thumb {
+      flex: none;
+      width: 52px;
+      height: 52px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #d9dee5, #c3cad4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .product-name {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .product-price {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .product-status {
+      display: inline-block;
+      margin-top: 2px;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: #e6f4ea;
+      color: #2f7a46;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* 채팅 영역: 거래촉 분석 대상 (선택 가능한 일반 텍스트) */
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px 16px 24px;
+      background: #f7f8fa;
+      min-height: 360px;
+    }
+
+    .message {
+      max-width: 75%;
+      margin: 0;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 15px;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .message.buyer {
+      align-self: flex-end;
+      background: #ffe9a8;
+      border-bottom-right-radius: 6px;
+    }
+
+    .message.seller {
+      align-self: flex-start;
+      background: #ffffff;
+      border: 1px solid #e3e7ec;
+      border-bottom-left-radius: 6px;
+    }
+
+    .message::selection,
+    .message *::selection {
+      background: #b9d4ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="notice">거래촉 기능 시연을 위한 예시 중고거래 채팅 화면입니다.</p>
+
+    <div class="card">
+      <div class="header">거래촉 시연용 중고거래</div>
+
+      <div class="product">
+        <div class="product-thumb" aria-hidden="true">🎧</div>
+        <div>
+          <div class="product-name">무선 이어폰</div>
+          <div class="product-price">85,000원</div>
+          <span class="product-status">거래 상담 중</span>
+        </div>
+      </div>
+
+      <!-- 각 메시지는 블록 요소이므로 드래그 선택 시 메시지 내용만 한 줄씩 복사된다 -->
+      <section class="chat" aria-label="거래 대화">
+        <p class="message buyer">안녕하세요! 제품 구매하고 싶어요!</p>
+        <p class="message seller">네, 잠시만요.</p>
+        <p class="message seller">제가 지금 안전결제 사용이 안되는데,,</p>
+        <p class="message buyer">그럼 직거래는 가능하세요?</p>
+        <p class="message seller">제가 시골에 살아서 그건 어려워요.</p>
+        <p class="message seller">ⓚⓚ5 주세요.</p>
+      </section>
+    </div>
+
+    <p class="guide">분석할 대화 내용을 마우스로 드래그한 뒤 거래촉 확장 프로그램을 실행해 주세요.</p>
+  </div>
+</body>
+</html>
